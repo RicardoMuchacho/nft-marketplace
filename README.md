@@ -1,66 +1,62 @@
-## Foundry
+# 🌐 NFT Marketplace
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A smart contract for creating and managing an NFT marketplace. It enables users to list, buy, and unlist NFTs while charging a 5% marketplace fee on each transaction. Built using Foundry and fully tested to ensure reliability and security.
 
-Foundry consists of:
+---
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## ✨ Key Features
 
-## Documentation
+| **Feature**        | **Description**                                                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| 5% Marketplace Fee | A 5% fee is charged when buying lsited NFTs, ensuring the sustainability and growth of the marketplace. |
+| Security Measures  | Proper access control ensures that only the seller can list or unlist their NFTs and only the owner can withdraw fees                  |                     |
+| Fully Tested       | The contract is fully tested using Foundry to ensure security and functionality.                    |
 
-https://book.getfoundry.sh/
+---
 
-## Usage
+## 📊 Contract Overview
 
-### Build
+### `Marketplace.sol`
 
-```shell
-$ forge build
-```
+This contract defines the core functionality of the NFT marketplace
 
-### Test
+| **Function**                                                     | **Description**                                                                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `constructor()`                                                  | Initializes the contract. |
+| `listNFT(address nftAddress_, uint256 tokenId_, uint256 price_)` | Allows a seller to list their NFT for sale at a specific price.                                                          |
+| `unlistNFT(address nftAddress_, uint256 tokenId_)`               | Allows the seller to unlist their NFT from the marketplace.                                                              |
+| `buyNFT(address nftAddress_, uint256 tokenId_)`                  | Allows a buyer to purchase an NFT, deducting the 5% marketplace fee and transferring the remaining amount to the seller. |
+| `withdrawFees()`                                                 | Allows the contract owner to withdraw the accumulated fees.                                                              |
 
-```shell
-$ forge test
-```
+---
 
-### Format
+## 🛠️ Installation
 
-```shell
-$ forge fmt
-```
+To interact with the contract, follow these steps:
 
-### Gas Snapshots
+1. **Clone the Repository:**
 
-```shell
-$ forge snapshot
-```
+   ```bash
+   git clone https://github.com/yourusername/nft-marketplace.git
+   cd nft-marketplace
+   ```
 
-### Anvil
+2. **Install Dependencies:**
 
-```shell
-$ anvil
-```
+   Ensure you have Foundry installed. If not, you can follow the [Foundry installation guide](https://book.getfoundry.sh/).
 
-### Deploy
+3. **Compile the Contract:**
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+   ```bash
+   forge build
+   ```
 
-### Cast
+4. **Run Tests:**
 
-```shell
-$ cast <subcommand>
-```
+   The contract is fully tested with Foundry. To run the tests, use the following command:
 
-### Help
+   ```bash
+   forge test
+   ```
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+---
