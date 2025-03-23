@@ -41,9 +41,9 @@ contract MarketplaceTest is Test {
     function test_listNft() public {
         vm.startPrank(seller);
 
-        ( , address sellerBefore , ,) = marketplace.listings(address(nft), 0);
+        (, address sellerBefore,,) = marketplace.listings(address(nft), 0);
         marketplace.listNFT(address(nft), 0, 0.1 ether);
-        ( , address sellerAfter , ,) = marketplace.listings(address(nft), 0);
+        (, address sellerAfter,,) = marketplace.listings(address(nft), 0);
 
         vm.stopPrank();
 
@@ -65,16 +65,15 @@ contract MarketplaceTest is Test {
         vm.stopPrank();
     }
 
-
     // Unlist NFT
     function test_unlistNft() public {
         vm.startPrank(seller);
 
         marketplace.listNFT(address(nft), 0, 0.1 ether);
 
-        ( , address sellerBefore , ,) = marketplace.listings(address(nft), 0);
+        (, address sellerBefore,,) = marketplace.listings(address(nft), 0);
         marketplace.unlistNFT(address(nft), 0);
-        ( , address sellerAfter , ,) = marketplace.listings(address(nft), 0);
+        (, address sellerAfter,,) = marketplace.listings(address(nft), 0);
 
         assertEq(sellerBefore, seller);
         assertEq(sellerAfter, address(0));
@@ -106,7 +105,7 @@ contract MarketplaceTest is Test {
         uint256 feesBefore = address(marketplace).balance;
         marketplace.buyNFT{value: nftPrice}(address(nft), tokenId);
         address nftOwnerAfter = nft.ownerOf(tokenId);
-        ( , address sellerAfter , ,) = marketplace.listings(address(nft), 0);
+        (, address sellerAfter,,) = marketplace.listings(address(nft), 0);
         uint256 feesAfter = address(marketplace).balance;
 
         uint256 expectedFees = (nftPrice * marketplace.feeFraction()) / 10000;
@@ -117,8 +116,8 @@ contract MarketplaceTest is Test {
 
         assertEq(sellerAfter, address(0)); //listing deleted
         assertEq(sellerBalanceAfter, sellerBalanceBefore + expectedPayment); // seller payed
-        assertEq(nftOwnerAfter, buyer); // buyer received NFT                    
-        assertEq(expectedFees, feesAfter - feesBefore); // marketplace fees collected                   
+        assertEq(nftOwnerAfter, buyer); // buyer received NFT
+        assertEq(expectedFees, feesAfter - feesBefore); // marketplace fees collected
     }
 
     function test_revertBuyNftIfNotListed() public payable {
