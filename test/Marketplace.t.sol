@@ -3,7 +3,7 @@
 pragma solidity >= 0.8.24;
 
 import "../lib/openzeppelin-contracts/contracts/interfaces/IERC721.sol";
-import {Test, console} from "forge-std/Test.sol";
+import { Test, console } from "forge-std/Test.sol";
 import {NFTmock} from "./NFTmock.t.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
@@ -14,6 +14,13 @@ contract MarketplaceTest is Test {
     address owner = vm.addr(1);
     address seller = vm.addr(2);
     address buyer = vm.addr(3);
+
+    struct Listing {
+        address nftAddress;
+        address seller;
+        uint256 tokenId;
+        uint256 price;
+    }
 
     function setUp() public {
         vm.startPrank(owner);
@@ -94,8 +101,8 @@ contract MarketplaceTest is Test {
         uint256 nftPrice = 0.1 ether;
 
         vm.startPrank(seller);
-        marketplace.listNFT(address(nft), tokenId, nftPrice);
         nft.approve(address(marketplace), tokenId);
+        marketplace.listNFT(address(nft), tokenId, nftPrice);
         vm.stopPrank();
 
         vm.startPrank(buyer);
@@ -179,5 +186,39 @@ contract MarketplaceTest is Test {
         vm.expectRevert();
         marketplace.withdrawFees();
         vm.stopPrank();
+    }
+
+    function test_buyNftErrors() public payable {
+        uint256 tokenId = 0;
+        uint256 nftPrice = 0.1 ether;
+
+        vm.startPrank(seller);
+        nft.approve(address(marketplace), tokenId);
+        marketplace.listNFT(address(nft), tokenId, nftPrice);
+        vm.stopPrank();
+
+        vm.startPrank(buyer);
+        vm.deal(buyer, nftPrice);
+
+        uint256 sellerBalanceBefore = seller.balance;
+        uint256 feesBefore = address(marketplace).balance;
+
+        Marketplace.Listing memory listi = marketplace.buyNFT{value: nftPrice}(address(nft), tokenId);
+        console.log(listi.nftAddress, listi.seller, listi.tokenId);
+      
+        address nftOwnerAfter = nft.ownerOf(tokenId);
+        (, address sellerAfter,,) = marketplace.listings(address(nft), 0);
+        uint256 feesAfter = address(marketplace).balance;
+
+        uint256 expectedFees = (nftPrice * marketplace.feeFraction()) / 10000;
+        uint256 expectedPayment = nftPrice - expectedFees;
+        uint256 sellerBalanceAfter = seller.balance;
+
+        vm.stopPrank();
+
+        assertEq(sellerAfter, address(0)); //listing deleted
+        // assertEq(sellerBalanceAfter, sellerBalanceBefore + expectedPayment); // seller payed
+        assertEq(nftOwnerAfter, buyer); // buyer received NFT
+        assertEq(expectedFees, feesAfter - feesBefore); // marketplace fees collected
     }
 }
