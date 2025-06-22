@@ -3,7 +3,7 @@
 pragma solidity >= 0.8.24;
 
 import "../lib/openzeppelin-contracts/contracts/interfaces/IERC721.sol";
-import { Test, console } from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {NFTmock} from "./NFTmock.t.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
@@ -204,7 +204,7 @@ contract MarketplaceTest is Test {
 
         Marketplace.Listing memory listi = marketplace.buyNFT{value: nftPrice}(address(nft), tokenId);
         console.log(listi.nftAddress, listi.seller, listi.tokenId);
-      
+
         address nftOwnerAfter = nft.ownerOf(tokenId);
         (, address sellerAfter,,) = marketplace.listings(address(nft), 0);
         uint256 feesAfter = address(marketplace).balance;
@@ -223,7 +223,7 @@ contract MarketplaceTest is Test {
     function test_getActiveListings() public {
         address addr = address(nft);
         uint256 tokenID = 0;
-        uint256 price = 0.1 ether; 
+        uint256 price = 0.1 ether;
 
         vm.startPrank(seller);
 

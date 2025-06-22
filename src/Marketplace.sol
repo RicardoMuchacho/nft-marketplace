@@ -34,7 +34,9 @@ contract Marketplace is Ownable, ReentrancyGuard {
 
     event listed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price);
     event unlisted(address indexed seller, address indexed nftAddress, uint256 indexed tokendId, uint256 price);
-    event boughtNFT(address indexed seller, address indexed nftAddress, uint256 indexed tokendId, address buyer, uint256 price);
+    event boughtNFT(
+        address indexed seller, address indexed nftAddress, uint256 indexed tokendId, address buyer, uint256 price
+    );
     event feesCollected(uint256 fees);
 
     constructor() Ownable(msg.sender) {}
@@ -83,7 +85,7 @@ contract Marketplace is Ownable, ReentrancyGuard {
     }
 
     // Buy NFT
-    function buyNFT(address nftAddress_, uint256 tokenId_) external payable nonReentrant returns(Listing memory){
+    function buyNFT(address nftAddress_, uint256 tokenId_) external payable nonReentrant returns (Listing memory) {
         Listing memory currentListing = listings[nftAddress_][tokenId_];
 
         require(currentListing.seller != address(0), "Not listed");
@@ -91,7 +93,7 @@ contract Marketplace is Ownable, ReentrancyGuard {
 
         uint256 fees = (currentListing.price * feeFraction) / 10000;
         uint256 sellerProceeds = currentListing.price - fees;
-        
+
         // transferNFT
         IERC721(nftAddress_).safeTransferFrom(currentListing.seller, msg.sender, currentListing.tokenId);
 
@@ -116,20 +118,22 @@ contract Marketplace is Ownable, ReentrancyGuard {
         }
 
         delete listings[nftAddress_][tokenId_];
-        
-        emit boughtNFT(currentListing.seller, currentListing.nftAddress, currentListing.tokenId, msg.sender, currentListing.price);
+
+        emit boughtNFT(
+            currentListing.seller, currentListing.nftAddress, currentListing.tokenId, msg.sender, currentListing.price
+        );
         return currentListing;
     }
 
-      function getActiveListings() external view returns (Listing[] memory) {
-      require(activeListings.length > 0, "No Listings");
-      Listing[] memory result = new Listing[](activeListings.length);
-      for (uint256 i = 0; i < activeListings.length; i++) {
-          ListingKey memory key = activeListings[i];
-          result[i] = listings[key.nftAddress][key.tokenId];
-      }
-      return result;
-  }
+    function getActiveListings() external view returns (Listing[] memory) {
+        require(activeListings.length > 0, "No Listings");
+        Listing[] memory result = new Listing[](activeListings.length);
+        for (uint256 i = 0; i < activeListings.length; i++) {
+            ListingKey memory key = activeListings[i];
+            result[i] = listings[key.nftAddress][key.tokenId];
+        }
+        return result;
+    }
 
     function withdrawFees() external onlyOwner {
         uint256 currentFees = collectedFees;
